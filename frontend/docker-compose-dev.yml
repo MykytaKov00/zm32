@@ -1,0 +1,14 @@
+services:
+  node:
+    container_name: angularcontainer
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    ports:
+      - "4200:4200"  # Match with EXPOSE in Dockerfile
+    volumes:
+      - .:/app
+      - "./ssl:/certs"  # Mount the certificates
+      - /app/node_modules
+    working_dir: /app
+    command: ng serve --host 0.0.0.0 --poll=2000 --port 4200 --ssl true --ssl-key /certs/server.key --ssl-cert /certs/server.crt

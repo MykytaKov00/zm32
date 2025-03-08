@@ -1,0 +1,20 @@
+# start-docker-build.ps1
+
+# Set execution policy for the current user (run this separately if needed)
+# Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Start Docker Compose
+# Step 1: Force rebuild images without cache
+docker-compose -f docker-compose-prod.yml --env-file .env.local build --no-cache
+
+# Step 2: Bring down the running containers
+docker-compose down
+
+# Step 3: Start containers, forcing recreation
+docker-compose -f docker-compose-prod.yml --env-file .env.local up --force-recreate -d
+
+# Wait a few seconds
+Start-Sleep -Seconds 10
+
+# Open the URL in the default browser
+Start-Process "https://iba.local.de:4444"

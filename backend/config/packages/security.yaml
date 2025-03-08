@@ -1,0 +1,27 @@
+security:
+    enable_authenticator_manager: true
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        api:
+            pattern: ^/api/  # API routes starting with /api/
+            stateless: true  # Stateless for JWT
+            jwt: ~  # Enable JWT authentication
+            custom_authenticators:
+                - App\Security\CustomJWTAuthenticator
+            entry_point: App\Security\CustomJWTAuthenticator  # This is where you set the entry point
+
+    access_control:
+        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }  # Open access to login route
+        - { path: ^/api, roles: ROLE_USER }  # Requires ROLE_USER for all API routes
