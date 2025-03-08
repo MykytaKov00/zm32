@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  symfony:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/var/www/symfony:cached
+    environment:
+      DB_HOST: ${DB_HOST}
+      DATABASE_URL: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@database:3306/${MYSQL_DATABASE}
+      DATABASE_URL_CONSOLE: mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@database:3306/${MYSQL_DATABASE}
+      APP_ENV: ${APP_ENV:-prod}
+      APP_DEBUG: ${APP_DEBUG:-0}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - symfony-angular-network
+    depends_on:
+      database:
+        condition: service_healthy
+    entrypoint: /usr/local/bin/entrypoint.sh
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nginx:
+    build:
+      context: ./
+      dockerfile: Dockerfile-nginx
+    ports:
+      - "8000:80"
+      - "4433:443"
+    volumes:
+      - ./backend:/var/www/symfony:cached
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./backend/ssl:/etc/nginx/ssl
+      - angular_dist:/var/www/angular/dist
+    networks:
+      - symfony-angular-network
+    depends_on:
+      - symfony
+
+  nginx-angular:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile-nginx-angular
+    ports:
+      - "8001:80"
+      - "4200:443"
+    volumes:
+      - angular_dist:/var/www/angular/dist
+      - ./frontend/ssl:/etc/nginx/ssl
+    networks:
+      - symfony-angular-network
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile-php-fpm
+    volumes:
+      - ./backend:/var/www/symfony:cached
+      - ./var/log:/var/log
+    networks:
+      - symfony-angular-network
+
+  database:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - /.db_data:/var/lib/mysql
+    networks:
+      - symfony-angular-network
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "database", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  symfony-angular-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  angular_dist:

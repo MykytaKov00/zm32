@@ -1,0 +1,171 @@
+
+# start docker server with loading the file docker-compose.yml
+
+docker-compose -f docker-compose.yml build
+docker-compose -f docker-compose.yml up
+
+# start docker in detached mode
+docker-compose -f docker-compose.yml up -d
+
+#build and run the docker
+docker-compose -f docker-compose.yml up --build
+
+# execute commands inside docker container
+docker-compose exec symfony bash
+
+php bin/console doctrine:database:create
+
+// ngixt certificate
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt
+
+
+// Apache certifcate
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -out server.csr
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+
+mkcert -key-file ssl/server.key -cert-file ssl/server.crt iba.local.de localhost 192.168.1.90  192.168.2.106 ::1
+mkcert -key-file ssl/server.key -cert-file ssl/server.crt iba localhost 127.0.0.1 ::1
+
+mkcert -key-file ssl/server.key -cert-file ssl/server.crt iba.local.de localhost 127.0.0.1 192.168.178.21 192.168.1.90 192.168.2.114 server ::1
+
+
+FRONTEND:
+// start frontend in dev mode
+cd frontend in dev mode
+docker-compose -f docker-compose-dev.yml up --build
+https://localhost:4201/#/app-login
+
+// RUN ANGULAR IN DEV MODE WITH SSL
+npm run ng serve --ssl --ssl-key="ssl/server.key" --ssl-cert="ssl/server.crt"
+
+
+// remove all containers
+docker-compose -f docker-compose-dev.yml down --rmi all --volumes --remove-orphans
+docker-compose -f docker-compose-dev.yml build --no-cache
+docker-compose -f docker-compose-dev.yml up
+
+// build frontend
+// ddev exec npm run build
+
+BACKEND:
+// start backend in dev mode in iba-app/backend directory
+ddev restart
+
+//
+docker compose run node npm i && docker compose up
+docker compose run node npm i && docker compose run node npm i && docker-compose -f docker-compose.yml up --build
+
+
+
+ddev exec php bin/console doctrine:database:drop --force
+ddev exec php bin/console doctrine:database:create
+ddev exec php bin/console doctrine:migrations:diff
+ddev exec php bin/console doctrine:migrations:migrate
+
+
+angular:
+nvm install 18.19.0
+nvm use 18.19.0
+
+
+// Production mode
+docker-compose -f docker-compose-prod.yml --env-file .env.local up --build
+
+// execute command in shell
+docker exec -it zm32-symfony-1 sh
+docker exec -it zm32-angular-1 sh
+
+// troubleshouting
+
+secure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+docker-compose logs symfony
+
+// Restart only symfony without rebuilding
+docker-compose -f docker-compose-prod.yml restart symfony
+
+
+// kill angular ng serve
+ps aux | grep ng
+
+Example:
+ ps aux | grep ng
+node          18  0.0  0.0   2576   896 ?        S    10:51   0:00 sh -c ng serve --host 0.0.0.0 --port 4200
+node          19 10.5  3.0 34514408 481540 ?     Sl   10:51   0:29 ng serve --host 0.0.0.0 --port 4200
+node          30  0.3  0.1 724452 24436 ?        Sl   10:52   0:00 /app/node_modules/@esbuild/linux-x64/bin/esbuild --service=0.21.3 --ping
+node          60  0.0  0.0   3324  1512 pts/0    S+   10:56   0:00 grep ng
+
+kill -9 18 19 30 60
+
+
+// rebuild only ngindx service
+docker-compose -f docker-compose-prod.yml up --build nginx
+
+
+ docker-compose exec php-fpm sh
+ cd /usr/local/etc/php-fpm.d/
+ vi www.conf
+
+ access.log = /var/log/php-fpm.access.log
+ slowlog = /var/log/php-fpm.slow.log
+
+
+// show all containers running
+docker-compose -f docker-compose-dev.yml ps
+
+
+// check mysql user connection
+
+docker exec -it zm32-database-1 sh
+docker exec -it zm32-symfony-1 sh
+
+docker-compose run --rm zm32-symfony-1 sh
+
+mysql -u zm_32 -p
+
+ echo "DB_HOST: $DB_HOST"
+ echo "MYSQL_USER: $MYSQL_USER"
+ echo "MYSQL_PASSWORD: $MYSQL_PASSWORD"
+ echo "MYSQL_DATABASE: $MYSQL_DATABASE"
+
+
+
+ test cors for get
+ curl -I -X GET -k https://iba.local.de:4433/login/66
+ curl -I -X OPTIONS -k https://iba.local.de:4433/login/66
+
+ curl -I -X GET -k https://iba.local.de:4200/api/login/66
+ curl -I -X OPTIONS -k https://iba.local.de:4200/api/login/66
+
+
+// show all containers running in dev for frontend
+docker-compose -f docker-compose-dev.yml ps
+docker exec -it angularcontainer sh
+npm run ng generate component data-griddd-artikel/hersteller-edit-component
+
+
+// bash in symfony in docker
+ docker exec -it zm32-symfony-1 sh
+//insure that php-fpm is running
+ php-fpm -F
+
+ docker exec -it zm32-symfony-1 php-fpm -F
+ docker exec -it zm32-symfony-1 curl -I http://localhost:9001
+
+ docker run --rm -it --name certbot -v "${PWD}/letsencrypt/certbot:/etc/letsencrypt" -v "${PWD}/angular_dist:/var/www/html" certbot/certbot certonly --webroot -w /var/www/html -d iba.local.de
+
+// install ssl certificates for local hosts 
+ Open certmgr.msc.
+
+ // install libraries in dev mode in angular:
+ docker exec -it angularcontainer sh
+ # run inside the container
+ npm install @auth0/angular-jwt --save
+
+
+
+ // Restart only symfony without rebuilding
+ docker-compose -f docker-compose-prod.yml down symfony
+ docker-compose -f docker-compose-prod.yml build symfony
+ docker-compose -f docker-compose-prod.yml up symfony

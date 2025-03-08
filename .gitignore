@@ -1,0 +1,9 @@
+
+/.env.local
+/my_sqldata/
+/cron.log
+/config/start-docker-build-prod.ps1
+/.idea/phpspec.xml
+/.idea/zm32.iml
+/.idea/workspace.xml
+.idea/*

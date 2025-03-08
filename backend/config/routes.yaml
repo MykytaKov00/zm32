@@ -1,0 +1,8 @@
+#index:
+#    path: /materialliste
+#    controller: App\Controller\IndexController::getmaterialliste
+
+login_check:
+    path: /login_check
+    options:
+        expose: true
