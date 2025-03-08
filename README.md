@@ -10,8 +10,8 @@ Running on windows
 
 Running on Linux
 1. Install Docker and Docker Composer. Install Docker Desktop if necessary
-2. run the following the file 'start-docker-build-prod.sh' in config folder
-
+2. Change to config directory and run the following the file 'start-docker-build-prod.sh' as root
+sudo ./start-docker-build-prod.sh
 
 Use Pin "0066" to login as a user
 
