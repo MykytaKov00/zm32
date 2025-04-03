@@ -7,3 +7,4 @@
 /.idea/zm32.iml
 /.idea/workspace.xml
 .idea/*
+backend/.ddev/
